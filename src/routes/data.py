@@ -65,7 +65,7 @@ async def process_endpoint(request: Request, project_id: int, process_request_da
     do_reset = process_request_data.do_reset
     file_id = process_request_data.file_id
     
-    process_controller = ProcessController(project_id=project_id)
+    # process_controller = ProcessController(project_id=project_id)
     
     file_content = ProcessController(project_id=project_id).get_file_content(file_id = file_id)
     
