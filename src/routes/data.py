@@ -5,6 +5,8 @@ from controllers import DataController , ProjectController, ProcessController
 from models.enums import ResponseSignal
 from .scheme import ProcessRequest
 
+from models import ProjectModel
+
 import aiofiles
 import logging
 
@@ -16,8 +18,10 @@ data_router = APIRouter(
 )
 
 @data_router.post("/upload/{project_id}")
-async def upload_file(project_id: str, file:UploadFile, 
+async def upload_file(request: Request, project_id: str, file:UploadFile, 
                     app_settings:Settings = Depends(get_settings)):
+    
+    mongo_db_client = request.app.mongo_db_client
     
     is_valid, result_signal = DataController().validate_uploaded_file(file=file)
 
@@ -50,10 +54,16 @@ async def upload_file(project_id: str, file:UploadFile,
             }
         )
         
+    
+    project_model = ProjectModel(db_client=mongo_db_client)
+    
+    project = await project_model.get_project_or_create_one(project_id=project_id)
+    
     return JSONResponse(
             content={
                 "signal": ResponseSignal.FILE_UPLOAD_SUCCESS.value,
-                "file_id": file_id
+                "file_id": file_id,
+                "project_id": str(project.id)
             }
     )
     
