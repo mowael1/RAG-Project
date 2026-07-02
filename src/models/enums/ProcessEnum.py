@@ -4,3 +4,4 @@ class ProcessEnum(Enum):
     
     TXT = ".txt"
     PDF = ".pdf"
+    XLSX = ".xlsx"
