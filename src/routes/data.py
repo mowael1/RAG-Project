@@ -5,11 +5,13 @@ from controllers import DataController , ProjectController, ProcessController
 from models.enums import ResponseSignal
 from .scheme import ProcessRequest
 
-from models import ProjectModel, ChunkModel
-from models.db_schemes import chunk_scheme
+from models import ProjectModel, ChunkModel, AssetModel
+from models.db_schemes import chunk_scheme, asset_scheme
+from models.enums import AssetTypeEnum
 
 import aiofiles
 import logging
+import os
 
 logger = logging.getLogger("uvicorn")
 
@@ -34,7 +36,7 @@ async def upload_file(request: Request, project_id: str, file:UploadFile,
             }
         )
 
-    # Change file name and make file_path
+    # Change file name to random name(file_id) and make file_path
     file_path , file_id = DataController().generate_file_path(project_id=project_id, file_name=file)
     
     try:
@@ -60,9 +62,23 @@ async def upload_file(request: Request, project_id: str, file:UploadFile,
     
     project = await project_model.get_project_or_create_one(project_id=project_id)
     
+    
+    # Now we want to add file_id into chunk collection
+    asset_model = await AssetModel.create_instance(mongo_db_client)
+    
+    asset_resource = asset_scheme(
+        asset_project_id=project.id,
+        asset_type= AssetTypeEnum.FILE.value,
+        asset_name= file_id,
+        asset_size= os.path.getsize(file_path)
+    )
+    
+    asset_record = await asset_model.create_asset(asset_resource)
+    
     return JSONResponse(
             content={
                 "signal": ResponseSignal.FILE_UPLOAD_SUCCESS.value,
+                "chunk_id": str(asset_record.id),
                 "file_id": file_id,
                 "project_id": str(project.id)
             }
