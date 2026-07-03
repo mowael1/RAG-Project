@@ -5,7 +5,8 @@ from controllers import DataController , ProjectController, ProcessController
 from models.enums import ResponseSignal
 from .scheme import ProcessRequest
 
-from models import ProjectModel
+from models import ProjectModel, ChunkModel
+from models.db_schemes import chunk_scheme
 
 import aiofiles
 import logging
@@ -55,7 +56,7 @@ async def upload_file(request: Request, project_id: str, file:UploadFile,
         )
         
     
-    project_model = ProjectModel(db_client=mongo_db_client)
+    project_model = await ProjectModel.create_instance(db_client=mongo_db_client)
     
     project = await project_model.get_project_or_create_one(project_id=project_id)
     
@@ -69,7 +70,7 @@ async def upload_file(request: Request, project_id: str, file:UploadFile,
     
 
 @data_router.post("/process/{project_id}")
-async def process_endpoint(request: Request, project_id: int, process_request_data: ProcessRequest):
+async def process_endpoint(request: Request, project_id: str, process_request_data: ProcessRequest):
     chunk_size = process_request_data.chunk_size
     overlap_size = process_request_data.overlap_size
     do_reset = process_request_data.do_reset
@@ -97,4 +98,33 @@ async def process_endpoint(request: Request, project_id: int, process_request_da
             }
         )
         
-    return file_chunks
+    # We write this to get project id
+    project_model = await ProjectModel.create_instance(db_client=request.app.mongo_db_client)
+    
+    project = await project_model.get_project_or_create_one(project_id=project_id)
+    
+    file_chunks_records = [
+        chunk_scheme(
+            chunk_text = chunk.page_content,
+            chunk_metadata = chunk.metadata,
+            chunk_order = i+1,
+            chunk_project_id = project.id 
+        )
+        for i,chunk in enumerate(file_chunks)
+    ]
+    
+    
+    chunk_model = await ChunkModel.create_instance(request.app.mongo_db_client)
+    
+    
+    if do_reset == 1: 
+        await chunk_model.delete_chunks_by_project_id(project.id)
+        
+    no_records = await chunk_model.insert_many_chunks(file_chunks_records)
+    
+    return JSONResponse(
+            content={
+                "singal": ResponseSignal.PROCESSING_SUCCESS.value,
+                "inserted_chunks": no_records
+            }
+        )
