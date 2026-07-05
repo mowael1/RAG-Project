@@ -14,7 +14,7 @@ class chunk_scheme(BaseModel):
     
     # This will tell me this chunk belong to any project
     chunk_project_id: ObjectId
-    # chunk_asset_id: ObjectId
+    chunk_asset_id: ObjectId
     
     
         
