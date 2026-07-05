@@ -10,7 +10,13 @@ class Settings(BaseSettings):
     
     MONGODB_URL: str
     MONGODB_DATABASE_NAME: str
-        
+    
+    
+    
+    
+    
+    max_output_tokens: int
+    temperature: float
     class Config:
         env_file = ".env"
         
