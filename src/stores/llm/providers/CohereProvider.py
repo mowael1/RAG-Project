@@ -76,10 +76,9 @@ class CoHereProvider(LLMInterface):
             self.logger.error("Embedding model for Cohere was not set")
             return None
         
-        input_type = None
-        if document_type == DocumentTypeEnum.DOCUMENT.value:
-            input_type = CoHereEnums.DOCUMENT.value
-        elif document_type == DocumentTypeEnum.QUERY.value:
+        input_type = CoHereEnums.DOCUMENT.value
+        
+        if document_type == DocumentTypeEnum.QUERY.value:
             input_type = CoHereEnums.QUERY.value
 
         response = self.client.embed(
@@ -108,10 +107,7 @@ class CoHereProvider(LLMInterface):
             self.logger.error("Embedding model for Cohere was not set")
             return None
 
-        input_type = None
-        if document_type == DocumentTypeEnum.DOCUMENT.value:
-            input_type = CoHereEnums.DOCUMENT.value
-        elif document_type == DocumentTypeEnum.QUERY.value:
+        if document_type == DocumentTypeEnum.QUERY.value:
             input_type = CoHereEnums.QUERY.value
 
         response = self.client.embed(
