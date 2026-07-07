@@ -51,7 +51,6 @@ class OpenAIProvider(LLMInterface):
         self.embedding_size = embedding_size
         
     # بيتعامل بيه API عشان ده الي ال chat completions يتبعت تحوله للشكل بتاع ال prompt دي المسؤله ان اي 
-    
     def construct_prompt(self, prompt: str, role: str):
         return {"role": role, "content": prompt}
     
