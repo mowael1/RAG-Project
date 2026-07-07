@@ -30,3 +30,7 @@ class chunk_scheme(BaseModel):
                 "unique": False
             }
         ]
+        
+class RetrieveDocument(BaseModel):
+    text: str
+    score: float 
