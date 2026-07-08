@@ -3,7 +3,7 @@ from ..LLMEnums import CoHereEnums ,DocumentTypeEnum
 import cohere
 import logging
 
-from ....helpers.config import get_settings
+from helpers.config import get_settings
 
 class CoHereProvider(LLMInterface):
     
@@ -106,6 +106,8 @@ class CoHereProvider(LLMInterface):
         if not self.embedding_model_id:
             self.logger.error("Embedding model for Cohere was not set")
             return None
+
+        input_type = CoHereEnums.DOCUMENT.value
 
         if document_type == DocumentTypeEnum.QUERY.value:
             input_type = CoHereEnums.QUERY.value

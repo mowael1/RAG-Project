@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from ...models.db_schemes import RetrieveDocument
+from models.db_schemes import RetrieveDocument
 
 class VectorDBInterface(ABC):
     

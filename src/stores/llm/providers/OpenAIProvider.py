@@ -3,7 +3,7 @@ from ..LLMEnums import OpenAIEnums
 from openai import OpenAI
 import logging
 
-from ....helpers.config import get_settings
+from helpers.config import get_settings
 
 class OpenAIProvider(LLMInterface):
     

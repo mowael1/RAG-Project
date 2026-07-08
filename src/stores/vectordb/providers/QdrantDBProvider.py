@@ -1,8 +1,8 @@
 from qdrant_client import models, QdrantClient
 from ..VectorDBInterface import VectorDBInterface
 from ..VectorDBEnums import DistanceMethodEnums
-from ....models.db_schemes import RetrieveDocument
-from ....helpers.config import get_settings
+from models.db_schemes import RetrieveDocument
+from helpers.config import get_settings
 import logging
 
 class QdrantDBProvider(VectorDBInterface):
@@ -154,11 +154,10 @@ class QdrantDBProvider(VectorDBInterface):
             with_payload=True   # عشان يرجع الـ metadata مع النتائج
         )
 
-        all_results =  results.points
+        all_results = results.points
         
         if not all_results or len(all_results) == 0:
             return None
-        
         
         return [
             RetrieveDocument(text=result.payload["text"], score=result.score)
